@@ -29,7 +29,7 @@ const scaleY = d3
     .domain(yRange)
     .range([height, 0])
 
-ctx.strokeStyle = '#ffffff50'
+ctx.strokeStyle = '#505050'
 ctx.moveTo(scaleX(xRange[0]), scaleY(Math.sin(xRange[0])))
 for (let x = xRange[0]; x <= xRange[1]; x += 0.01) {
     ctx.lineTo(scaleX(x), scaleY(Math.sin(x)))
