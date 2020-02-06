@@ -35,8 +35,8 @@
       crossorigin
       src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"
     ></script>
-    <script crossorigin src="https://unpkg.com/web3/dist/web3.min.js"></script>
-    <script crossorigin src="https://unpkg.com/@babel/standalone"></script>
+    <script crossorigin src="http://unpkg.com/web3/dist/web3.min.js"></script>
+    <script crossorigin src="http://unpkg.com/@babel/standalone"></script>
     <script type="text/babel">
       const web3 = new Web3(ethereum)
       const hash = web3.utils.sha3
@@ -129,8 +129,13 @@
         async componentDidMount() {
           const url =
             'https://raw.githubusercontent.com/AventusProtocolFoundation/protocol/master/api/storage.json'
-          const address = '0x66E6f6c64e702840e11fDaB052de04Bede06c92D'
           const version = '0.14'
+          const network = await web3.eth.net.getNetworkType()
+          console.log(network)
+          const address =
+            network === 'rinkeby'
+              ? '0x66E6f6c64e702840e11fDaB052de04Bede06c92D'
+              : '0xd6589f7CB6AE49f77ee9F666fF8AB84a91c07133'
           const storage = await Storage.create(url, address, version)
           const contract = await storage.getContract(
             CONTRACTS.MERKLE_ROOTS_MANAGER
@@ -181,7 +186,7 @@
         render() {
           const { events, start, end, filter, value } = this.state
           if (events.length === 0) return <div>Loading...</div>
-          
+
           const headers = []
           const headerRow = []
           const rows = []
@@ -189,12 +194,15 @@
           if (filter) {
             const parts = filter.split('.')
             filteredResults = events.filter(event => {
-                let item = event
-                for (const part of parts) item = item ? item[part] : item
-                return item === value
+              let item = event
+              for (const part of parts) item = item ? item[part] : item
+              return item === value
             })
           }
-          const tableEvents = (filteredResults.length > 0 ? filteredResults : events).slice(start, end)
+          const tableEvents = (filteredResults.length > 0
+            ? filteredResults
+            : events
+          ).slice(start, end)
           for (const header in events[0]) headers.push(header)
           for (const header of headers)
             headerRow.push(<th key={header}>{header}</th>)
@@ -241,7 +249,11 @@
                 </label>
                 <label>
                   Value:{' '}
-                  <input value={value} type="text" onChange={this.changeValue} />
+                  <input
+                    value={value}
+                    type="text"
+                    onChange={this.changeValue}
+                  />
                 </label>
               </div>
               <table>
