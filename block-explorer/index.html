@@ -131,7 +131,6 @@
             'https://raw.githubusercontent.com/AventusProtocolFoundation/protocol/master/api/storage.json'
           const version = '0.14'
           const network = await web3.eth.net.getNetworkType()
-          console.log(network)
           const address =
             network === 'rinkeby'
               ? '0x66E6f6c64e702840e11fDaB052de04Bede06c92D'
@@ -196,7 +195,7 @@
             filteredResults = events.filter(event => {
               let item = event
               for (const part of parts) item = item ? item[part] : item
-              return item === value
+              return item == value
             })
           }
           const tableEvents = (filteredResults.length > 0
