@@ -192,11 +192,11 @@
           let filteredResults = []
           if (filter) {
             const parts = filter.split('.')
-            filteredResults = events.filter(event => {
+            for (const event of events) {
               let item = event
               for (const part of parts) item = item ? item[part] : item
-              return item == value
-            })
+              if (item == value) filteredResults.push(event)
+            }
           }
           const tableEvents = (filteredResults.length > 0
             ? filteredResults
