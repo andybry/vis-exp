@@ -4,7 +4,7 @@ class App extends React.Component {
     this.state = {
       events: [],
       start: 0,
-      end: 50,
+      count: 50,
       filter: '',
       value: '',
       address: '',
@@ -13,7 +13,7 @@ class App extends React.Component {
       network: ''
     }
     this.changeStart = this.changeStart.bind(this)
-    this.changeEnd = this.changeEnd.bind(this)
+    this.changeCount = this.changeCount.bind(this)
     this.changeFilter = this.changeFilter.bind(this)
     this.changeValue = this.changeValue.bind(this)
   }
@@ -32,7 +32,7 @@ class App extends React.Component {
       }
     )
     this.setState({
-      contracts: this.props.contractManager.contractAddresses(),
+      contracts: this.props.contractManager.contractAddresses()
     })
   }
 
@@ -44,8 +44,8 @@ class App extends React.Component {
     this.setState({ start: e.target.value })
   }
 
-  changeEnd(e) {
-    this.setState({ end: e.target.value })
+  changeCount(e) {
+    this.setState({ count: e.target.value })
   }
 
   changeFilter(e) {
@@ -60,38 +60,39 @@ class App extends React.Component {
     const {
       events,
       start,
-      end,
+      count,
       filter,
       value,
       address,
       version,
       contracts,
-      network
+      network,
     } = this.state
-    if (events.length === 0) return <div>Loading...</div>
 
     const headers = []
     const headerRow = []
     const rows = []
-    let filteredResults = []
     const parts = filter.split('.')
     const countByType = {}
+    let displayCount = 0
+    let index = 0
+    let filteredCount = 0
+
+    if (events[0]) headerRow.push(<th key="Row">Row</th>)
+    for (const header in events[0]) {
+      headers.push(header)
+      headerRow.push(<th key={header}>{header}</th>)
+    }
     for (const event of events) {
       countByType[event.event] = countByType[event.event] + 1 || 1
       if (filter) {
         let item = event
         for (const part of parts) item = item ? item[part] : item
-        if (item == value) filteredResults.push(event)
+        if (item != value) continue
+        filteredCount++
       }
-    }
-    const tableEvents = (filteredResults.length > 0
-      ? filteredResults
-      : events
-    ).slice(start, end)
-    for (const header in events[0]) headers.push(header)
-    for (const header of headers) headerRow.push(<th key={header}>{header}</th>)
-    for (const event of tableEvents) {
-      const tds = []
+      if (index++ < start || ++displayCount > count) continue
+      const tds = [<td key="Row">{index - 1}</td>]
       for (const header of headers)
         tds.push(
           <td key={header}>
@@ -104,6 +105,7 @@ class App extends React.Component {
         )
       rows.push(<tr key={event.id}>{tds}</tr>)
     }
+
     return (
       <div>
         <div>Network: {network}</div>
@@ -114,7 +116,7 @@ class App extends React.Component {
           <pre>{JSON.stringify(contracts, null, 2)}</pre>
         </div>
         <div>Total Results: {events.length}</div>
-        <div>Filtered Results: {filteredResults.length}</div>
+        <div>Filtered Results: {filteredCount}</div>
         <div>
           Summary:
           <pre>{JSON.stringify(countByType, null, 2)}</pre>
@@ -125,8 +127,8 @@ class App extends React.Component {
             <input value={start} type="number" onChange={this.changeStart} />
           </label>
           <label>
-            End Index:{' '}
-            <input value={end} type="number" onChange={this.changeEnd} />
+            Count:{' '}
+            <input value={count} type="number" onChange={this.changeCount} />
           </label>
         </div>
         <div>
@@ -139,6 +141,7 @@ class App extends React.Component {
             <input value={value} type="text" onChange={this.changeValue} />
           </label>
         </div>
+        <div>Data:</div>
         <table>
           <thead>
             <tr>{headerRow}</tr>
