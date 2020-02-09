@@ -19,7 +19,11 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
-
+    this.setState({
+      address: this.props.contractManager.address(),
+      version: this.props.contractManager.version(),
+      network: await web3.eth.net.getNetworkType()
+    })
     this.subscriptionId = await this.props.contractManager.subscribeAll(
       events => {
         this.setState(state => ({
@@ -28,10 +32,7 @@ class App extends React.Component {
       }
     )
     this.setState({
-      address: this.props.contractManager.address(),
-      version: this.props.contractManager.version(),
       contracts: this.props.contractManager.contractAddresses(),
-      network: await web3.eth.net.getNetworkType()
     })
   }
 
@@ -110,13 +111,7 @@ class App extends React.Component {
         <div>Version: {version}</div>
         <div>
           Contracts:
-          <pre>
-            {JSON.stringify(
-              contracts,
-              null,
-              2
-            )}
-          </pre>
+          <pre>{JSON.stringify(contracts, null, 2)}</pre>
         </div>
         <div>Total Results: {events.length}</div>
         <div>Filtered Results: {filteredResults.length}</div>
