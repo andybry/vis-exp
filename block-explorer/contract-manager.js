@@ -22,6 +22,20 @@ class ContractManager {
   constructor(storage) {
     this.storage = storage
   }
+  
+  address() {
+    return this.storage.contract._address
+  }
+
+  version() {
+    return this.storage.version
+  }
+
+  contractAddresses() {
+    const ret = {}
+    for (const name in this.contracts) ret[CONTRACTS_BY_NAME[name]] = this.contracts[name]._address
+    return ret
+  }
 
   async contract(name) {
     let contract = this.contracts[name]
@@ -48,7 +62,7 @@ class ContractManager {
   async subscribeAll(f) {
     const subscriptions = []
     for (const name in CONTRACTS_BY_NAME)
-      subscriptions.push(this.subscribe(name, f))
+      subscriptions.push(await this.subscribe(name, f))
     return this.subscriptions.push(subscriptions)
   }
 
@@ -64,6 +78,6 @@ class ContractManager {
     const network = await web3.eth.net.getNetworkType()
     const address = config.byNetwork[network]
     const storage = await Storage.init(config.abiUrl, address, config.version)
-    return new ContractManager(storage)
+    return new ContractManager(storage, config)
   }
 }

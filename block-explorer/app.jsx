@@ -6,7 +6,10 @@ class App extends React.Component {
       start: 0,
       end: 50,
       filter: '',
-      value: ''
+      value: '',
+      address: '',
+      version: '',
+      contracts: {}
     }
     this.changeStart = this.changeStart.bind(this)
     this.changeEnd = this.changeEnd.bind(this)
@@ -22,6 +25,11 @@ class App extends React.Component {
         }))
       }
     )
+    this.setState({
+      address: this.props.contractManager.address(),
+      version: this.props.contractManager.version(),
+      contracts: this.props.contractManager.contractAddresses(),
+    })
   }
 
   componentWillUnmount() {
@@ -45,7 +53,16 @@ class App extends React.Component {
   }
 
   render() {
-    const { events, start, end, filter, value } = this.state
+    const {
+      events,
+      start,
+      end,
+      filter,
+      value,
+      address,
+      version,
+      contracts
+    } = this.state
     if (events.length === 0) return <div>Loading...</div>
 
     const headers = []
@@ -84,10 +101,22 @@ class App extends React.Component {
     }
     return (
       <div>
+        <div>Storage address: {address}</div>
+        <div>Version: {version}</div>
+        <div>
+          Contracts:
+          <pre>
+            {JSON.stringify(
+              contracts,
+              null,
+              2
+            )}
+          </pre>
+        </div>
         <div>Total Results: {events.length}</div>
         <div>Filtered Results: {filteredResults.length}</div>
         <div>
-          Summary: 
+          Summary:
           <pre>{JSON.stringify(countByType, null, 2)}</pre>
         </div>
         <div>
@@ -102,7 +131,7 @@ class App extends React.Component {
         </div>
         <div>
           <label>
-            Filter:{' '}
+            Filter (can be dot separated):{' '}
             <input value={filter} type="text" onChange={this.changeFilter} />
           </label>
           <label>
