@@ -9,7 +9,8 @@ class App extends React.Component {
       value: '',
       address: '',
       version: '',
-      contracts: {}
+      contracts: {},
+      network: ''
     }
     this.changeStart = this.changeStart.bind(this)
     this.changeEnd = this.changeEnd.bind(this)
@@ -18,6 +19,7 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
+
     this.subscriptionId = await this.props.contractManager.subscribeAll(
       events => {
         this.setState(state => ({
@@ -29,6 +31,7 @@ class App extends React.Component {
       address: this.props.contractManager.address(),
       version: this.props.contractManager.version(),
       contracts: this.props.contractManager.contractAddresses(),
+      network: await web3.eth.net.getNetworkType()
     })
   }
 
@@ -61,7 +64,8 @@ class App extends React.Component {
       value,
       address,
       version,
-      contracts
+      contracts,
+      network
     } = this.state
     if (events.length === 0) return <div>Loading...</div>
 
@@ -101,6 +105,7 @@ class App extends React.Component {
     }
     return (
       <div>
+        <div>Network: {network}</div>
         <div>Storage address: {address}</div>
         <div>Version: {version}</div>
         <div>
